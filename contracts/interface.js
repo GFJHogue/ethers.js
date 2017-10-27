@@ -392,15 +392,17 @@ function Interface(abi) {
 
                         var params = Array.prototype.slice.call(arguments, 0);
 
-                        if (params.length < inputTypes.length) {
+                        if (params.length < inputTypes.length && params.length) {
                             throwError('missing parameter');
                         } else if (params.length > inputTypes.length) {
                             throwError('too many parameters');
                         }
 
-                        signature = utils.keccak256(utils.toUtf8Bytes(signature)).substring(0, 10);
+                        if (params.length || !inputTypes.length) {
+                            signature = utils.keccak256(utils.toUtf8Bytes(signature)).substring(0, 10);
+                            result.data = signature + Interface.encodeParams(inputTypes, params).substring(2);
+                        }
 
-                        result.data = signature + Interface.encodeParams(inputTypes, params).substring(2);
                         if (method.constant) {
                             result.parse = function(data) {
                                 return Interface.decodeParams(
